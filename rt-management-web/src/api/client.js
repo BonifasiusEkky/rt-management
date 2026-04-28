@@ -17,4 +17,16 @@ client.interceptors.request.use((config) => {
     return config;
 });
 
+// Interceptor untuk handle response error
+client.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            // Opsional: window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default client;
