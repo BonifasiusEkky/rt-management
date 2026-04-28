@@ -15,4 +15,9 @@ class Rumah extends Model
     {
         return $this->hasMany(Penghunian::class);
     }
+
+    public function penghunianAktif()
+    {
+        return $this->hasOne(Penghunian::class)->where('aktif', true)->with('penghuni');
+    }
 }

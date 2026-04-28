@@ -2,20 +2,18 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import useAuthStore from './store/useAuthStore';
 import LoginPage from './pages/LoginPage';
+import PenghuniList from './pages/penghuni/PenghuniList';
+import PenghuniForm from './pages/penghuni/PenghuniForm';
+import PenghuniDetail from './pages/penghuni/PenghuniDetail';
+import RumahList from './pages/rumah/RumahList';
+import RumahDetail from './pages/rumah/RumahDetail';
 
-// Dummy Dashboard Component
+// Dashboard Placeholder
 const Dashboard = () => {
-  const { user, logout } = useAuthStore();
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold">Selamat Datang, {user?.name}!</h1>
-      <p className="text-gray-600">Anda berada di Dashboard RT Management.</p>
-      <button 
-        onClick={logout}
-        className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
-      >
-        Logout
-      </button>
+      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+      <p className="text-gray-600">Selamat datang di sistem manajemen RT Elite Residence.</p>
     </div>
   );
 };
@@ -35,14 +33,18 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route 
-        path="/" 
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        } 
-      />
+      
+      <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      
+      {/* Penghuni Routes */}
+      <Route path="/penghuni" element={<ProtectedRoute><PenghuniList /></ProtectedRoute>} />
+      <Route path="/penghuni/baru" element={<ProtectedRoute><PenghuniForm /></ProtectedRoute>} />
+      <Route path="/penghuni/:id" element={<ProtectedRoute><PenghuniDetail /></ProtectedRoute>} />
+      
+      {/* Rumah Routes */}
+      <Route path="/rumah" element={<ProtectedRoute><RumahList /></ProtectedRoute>} />
+      <Route path="/rumah/:id" element={<ProtectedRoute><RumahDetail /></ProtectedRoute>} />
+      
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
