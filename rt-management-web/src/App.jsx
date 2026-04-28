@@ -2,21 +2,16 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import useAuthStore from './store/useAuthStore';
 import LoginPage from './pages/LoginPage';
+import Dashboard from './pages/Dashboard';
 import PenghuniList from './pages/penghuni/PenghuniList';
 import PenghuniForm from './pages/penghuni/PenghuniForm';
 import PenghuniDetail from './pages/penghuni/PenghuniDetail';
 import RumahList from './pages/rumah/RumahList';
 import RumahDetail from './pages/rumah/RumahDetail';
-
-// Dashboard Placeholder
-const Dashboard = () => {
-  return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-      <p className="text-gray-600">Selamat datang di sistem manajemen RT Elite Residence.</p>
-    </div>
-  );
-};
+import PembayaranList from './pages/pembayaran/PembayaranList';
+import PembayaranForm from './pages/pembayaran/PembayaranForm';
+import PengeluaranList from './pages/pengeluaran/PengeluaranList';
+import PengaturanPage from './pages/pengaturan/PengaturanPage';
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -44,6 +39,16 @@ function App() {
       {/* Rumah Routes */}
       <Route path="/rumah" element={<ProtectedRoute><RumahList /></ProtectedRoute>} />
       <Route path="/rumah/:id" element={<ProtectedRoute><RumahDetail /></ProtectedRoute>} />
+
+      {/* Pembayaran Routes */}
+      <Route path="/pembayaran" element={<ProtectedRoute><PembayaranList /></ProtectedRoute>} />
+      <Route path="/pembayaran/baru" element={<ProtectedRoute><PembayaranForm /></ProtectedRoute>} />
+
+      {/* Pengeluaran Routes */}
+      <Route path="/pengeluaran" element={<ProtectedRoute><PengeluaranList /></ProtectedRoute>} />
+
+      {/* Pengaturan Routes */}
+      <Route path="/pengaturan" element={<ProtectedRoute><PengaturanPage /></ProtectedRoute>} />
       
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
