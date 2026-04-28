@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\V1\RumahController;
 use App\Http\Controllers\Api\V1\PembayaranController;
 use App\Http\Controllers\Api\V1\PengeluaranController;
 use App\Http\Controllers\Api\V1\PengaturanController;
+use App\Http\Controllers\Api\V1\DashboardController;
 
 Route::prefix('v1')->group(function () {
     Route::get('/ping', function () {
@@ -30,6 +31,7 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
+        Route::get('/dashboard', [DashboardController::class, 'index']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
 
         Route::apiResource('penghuni', PenghuniController::class);
