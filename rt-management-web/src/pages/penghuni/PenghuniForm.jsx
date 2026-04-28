@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import client from '../../api/client';
 import Layout from '../../components/Layout';
 
@@ -38,8 +39,16 @@ const PenghuniForm = () => {
 
     return (
         <Layout>
-            <div className="p-8 max-w-2xl mx-auto">
-                <h1 className="text-3xl font-bold mb-8">Tambah Penghuni Baru</h1>
+            <div className="p-10 max-w-2xl mx-auto min-h-screen bg-white">
+                <div className="mb-10">
+                    <Link to="/penghuni" className="group inline-flex items-center gap-2 text-slate-400 hover:text-slate-900 transition-colors mb-4">
+                        <div className="p-2 rounded-xl bg-gray-50 group-hover:bg-gray-100 transition-colors">
+                            <ArrowLeftIcon className="w-4 h-4" />
+                        </div>
+                        <span className="text-xs font-bold uppercase tracking-widest">Back to List</span>
+                    </Link>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Add New Resident</h1>
+                </div>
                 
                 <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-6">
                     <div>

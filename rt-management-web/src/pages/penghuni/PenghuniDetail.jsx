@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import client from '../../api/client';
 import Layout from '../../components/Layout';
 
@@ -29,11 +30,16 @@ const PenghuniDetail = () => {
 
     return (
         <Layout>
-            <div className="p-8 max-w-4xl mx-auto">
-                <div className="flex justify-between items-start mb-8">
+            <div className="p-10 max-w-5xl mx-auto min-h-screen bg-white">
+                <div className="flex justify-between items-start mb-10">
                     <div>
-                        <Link to="/penghuni" className="text-blue-600 text-sm font-semibold hover:underline">← Kembali ke Daftar</Link>
-                        <h1 className="text-3xl font-bold text-gray-900 mt-2">{p.nama_lengkap}</h1>
+                        <Link to="/penghuni" className="group inline-flex items-center gap-2 text-slate-400 hover:text-slate-900 transition-colors mb-4">
+                            <div className="p-2 rounded-xl bg-gray-50 group-hover:bg-gray-100 transition-colors">
+                                <ArrowLeftIcon className="w-4 h-4" />
+                            </div>
+                            <span className="text-xs font-bold uppercase tracking-widest">Back to List</span>
+                        </Link>
+                        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{p.nama_lengkap}</h1>
                         <div className="flex space-x-2 mt-2">
                             <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${
                                 p.status === 'tetap' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'

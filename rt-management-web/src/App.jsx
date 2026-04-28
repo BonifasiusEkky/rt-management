@@ -12,6 +12,7 @@ import PembayaranList from './pages/pembayaran/PembayaranList';
 import PembayaranForm from './pages/pembayaran/PembayaranForm';
 import PengeluaranList from './pages/pengeluaran/PengeluaranList';
 import PengaturanPage from './pages/pengaturan/PengaturanPage';
+import Tagihan from './pages/Tagihan';
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -46,6 +47,9 @@ function App() {
 
       {/* Pengeluaran Routes */}
       <Route path="/pengeluaran" element={<ProtectedRoute><PengeluaranList /></ProtectedRoute>} />
+
+      {/* Tagihan Route */}
+      <Route path="/tagihan" element={<ProtectedRoute><Tagihan /></ProtectedRoute>} />
 
       {/* Pengaturan Routes */}
       <Route path="/pengaturan" element={<ProtectedRoute><PengaturanPage /></ProtectedRoute>} />

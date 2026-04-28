@@ -36,94 +36,123 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="p-8">
-        <div className="flex justify-between items-center mb-8">
+      <div className="p-10 bg-white min-h-screen">
+        {/* Header with Navigation Tabs */}
+        <div className="flex justify-between items-center mb-10">
           <div>
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight">Dashboard Ringkasan</h1>
-            <p className="text-slate-500 font-medium">Statistik keuangan dan hunian perumahan.</p>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Dashboard</h1>
+            <p className="text-sm text-slate-400 mt-1">Overview of financial and residential health</p>
           </div>
-          <div className="flex items-center space-x-4">
-             <div className="text-right">
-                <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Saldo Kas Saat Ini</p>
-                <p className="text-2xl font-black text-blue-600">{formatCurrency(stats.saldo_saat_ini)}</p>
-             </div>
+          <div className="flex gap-4">
+            <button className="text-sm font-bold text-slate-900 border-b-2 border-slate-900 pb-1">Overview</button>
+            <button className="text-sm font-bold text-slate-400 hover:text-slate-900 pb-1 transition-colors">Analytics</button>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-            <p className="text-xs font-bold text-slate-400 uppercase mb-1">Total Warga</p>
-            <p className="text-3xl font-black text-slate-800">{stats.total_warga}</p>
-            <p className="text-[10px] text-slate-400 mt-2">Warga terdaftar (Aktif)</p>
+        {/* Main Stats Grid */}
+        <div className="grid grid-cols-4 gap-6 mb-10">
+          {/* Total Warga Card */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Residents</p>
+            <p className="text-3xl font-bold text-slate-900">{stats.total_warga}</p>
+            <p className="text-[11px] text-slate-400 mt-2 font-medium">Active registered citizens</p>
           </div>
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-            <p className="text-xs font-bold text-slate-400 uppercase mb-1">Okupansi</p>
-            <p className="text-3xl font-black text-slate-800">{stats.okupansi}%</p>
-            <p className="text-[10px] text-slate-400 mt-2">Rumah terisi vs total</p>
+
+          {/* Okupansi Card */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Occupancy</p>
+                <p className="text-3xl font-bold text-slate-900">{stats.okupansi}%</p>
+              </div>
+              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">+6%</span>
+            </div>
+            <p className="text-[11px] text-slate-400 mt-2 font-medium">Occupied units</p>
           </div>
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-            <p className="text-xs font-bold text-green-400 uppercase mb-1">In (Bulan Ini)</p>
-            <p className="text-3xl font-black text-green-600">{formatCurrency(stats.pemasukan_bulan_ini)}</p>
+
+          {/* Pemasukan Card */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Monthly In</p>
+            <p className="text-2xl font-bold text-slate-900">{formatCurrency(stats.pemasukan_bulan_ini)}</p>
+            <p className="text-[11px] text-slate-400 mt-2 font-medium">Total income this month</p>
           </div>
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-            <p className="text-xs font-bold text-red-400 uppercase mb-1">Out (Bulan Ini)</p>
-            <p className="text-3xl font-black text-red-600">{formatCurrency(stats.pengeluaran_bulan_ini)}</p>
+
+          {/* Pengeluaran Card */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Monthly Out</p>
+            <p className="text-2xl font-bold text-slate-900">{formatCurrency(stats.pengeluaran_bulan_ini)}</p>
+            <p className="text-[11px] text-slate-400 mt-2 font-medium">Total expenses this month</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Chart Section */}
-          <div className="lg:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-            <h2 className="text-lg font-bold text-slate-800 mb-8">Arus Kas 6 Bulan Terakhir</h2>
-            <div className="h-80 w-full">
+        <div className="grid grid-cols-3 gap-6 mb-10">
+          {/* Revenue Analytics Chart */}
+          <div className="col-span-2 bg-white border border-gray-100 rounded-2xl p-8 shadow-sm">
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 tracking-tight">Cash Flow</h2>
+                <p className="text-xs text-slate-400 mt-1">Income vs Expenses (Last 6 Months)</p>
+              </div>
+              <button className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors">Filters ▼</button>
+            </div>
+            <div className="h-64 -mx-6 px-6">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chart}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 600}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 600}} />
                   <Tooltip 
-                    contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
+                    contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: '#ffffff', color: '#1e293b', padding: '12px'}}
                     cursor={{fill: '#f8fafc'}}
                   />
-                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{paddingBottom: '20px'}} />
-                  <Bar dataKey="pemasukan" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Pemasukan" />
-                  <Bar dataKey="pengeluaran" fill="#ef4444" radius={[4, 4, 0, 0]} name="Pengeluaran" />
+                  <Legend verticalAlign="top" align="right" iconType="square" wrapperStyle={{paddingBottom: '24px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em'}} />
+                  <Bar dataKey="pemasukan" fill="#111827" radius={[4, 4, 0, 0]} name="In" />
+                  <Bar dataKey="pengeluaran" fill="#94a3b8" radius={[4, 4, 0, 0]} name="Out" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Quick Actions & Recent Transactions */}
-          <div className="space-y-8">
-            <div className="bg-slate-900 p-8 rounded-3xl shadow-xl text-white">
-              <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-4">Aksi Cepat</h3>
-              <button 
-                onClick={handleGenerate}
-                disabled={loadingTagihan}
-                className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-bold transition flex items-center justify-center space-x-2"
-              >
-                <span>{loadingTagihan ? 'Memproses...' : 'Tagih Iuran Bulan Ini'}</span>
-              </button>
-              {message && <p className="mt-4 text-center text-blue-300 text-xs font-medium">{message}</p>}
-            </div>
-
-            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-              <h3 className="text-sm font-bold text-slate-800 uppercase mb-6">Transaksi Terbaru</h3>
-              <div className="space-y-6">
-                {recent_pembayaran?.length > 0 ? recent_pembayaran.map(p => (
-                   <div key={p.id} className="flex justify-between items-center">
-                      <div>
-                        <p className="text-sm font-bold text-slate-900">{p.tagihans?.[0]?.penghunian?.penghuni?.nama_lengkap}</p>
-                        <p className="text-[10px] text-slate-400">{p.tanggal_bayar}</p>
-                      </div>
-                      <p className="text-sm font-black text-green-600">+{formatCurrency(p.jumlah_bayar)}</p>
-                   </div>
-                )) : (
-                  <p className="text-xs text-slate-400 italic">Belum ada transaksi.</p>
-                )}
+          {/* Saldo Kas Summary */}
+          <div className="bg-slate-900 text-white rounded-2xl p-8 shadow-sm flex flex-col">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">Total Balance</p>
+            <p className="text-3xl font-bold mb-auto">{formatCurrency(stats.saldo_saat_ini)}</p>
+            <div className="mt-8 space-y-4">
+              <div className="border-t border-slate-800 pt-4">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Net Change</p>
+                <p className="text-lg font-bold text-white mt-1">{formatCurrency(stats.pemasukan_bulan_ini - stats.pengeluaran_bulan_ini)}</p>
               </div>
+              <button className="w-full bg-white text-slate-900 font-bold py-3 rounded-xl hover:bg-gray-100 transition-all active:scale-[0.98] text-sm">Statements</button>
             </div>
+          </div>
+        </div>
+
+        {/* Recent Transactions */}
+        <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 tracking-tight">Recent Activity</h3>
+              <p className="text-xs text-slate-400 mt-1">Latest payment transactions</p>
+            </div>
+            <a href="#" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors">View All</a>
+          </div>
+          <div className="space-y-1">
+            {recent_pembayaran?.length > 0 ? recent_pembayaran.slice(0, 5).map(p => (
+              <div key={p.id} className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-xl transition-colors border-b border-gray-50 last:border-0">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-slate-900 text-xs font-bold">
+                    {p.tagihans?.[0]?.penghunian?.penghuni?.nama_lengkap?.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-900">{p.tagihans?.[0]?.penghunian?.penghuni?.nama_lengkap}</p>
+                    <p className="text-[11px] text-slate-400 font-medium">{p.tanggal_bayar}</p>
+                  </div>
+                </div>
+                <p className="text-sm font-bold text-slate-900">+{formatCurrency(p.jumlah_bayar)}</p>
+              </div>
+            )) : (
+              <p className="text-sm text-slate-400 text-center py-6">No recent activity.</p>
+            )}
           </div>
         </div>
       </div>

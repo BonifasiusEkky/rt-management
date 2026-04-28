@@ -11,41 +11,41 @@ const RumahList = () => {
 
     return (
         <Layout>
-            <div className="p-8">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Peta Rumah</h1>
-                    <p className="text-gray-500">Grid 20 unit rumah di Elite Residence.</p>
+            <div className="p-10 bg-white min-h-screen">
+                <div className="mb-10">
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Property Map</h1>
+                    <p className="text-sm text-slate-400 mt-1">Status of residential units in Elite Residence</p>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {isLoading ? (
-                        <p className="text-gray-400">Loading grid...</p>
+                        <p className="text-slate-400 font-medium">Loading map...</p>
                     ) : response?.data?.map((rumah) => (
                         <Link 
                             key={rumah.id} 
                             to={`/rumah/${rumah.id}`}
-                            className={`aspect-square rounded-2xl p-6 flex flex-col justify-between transition transform hover:scale-105 shadow-sm border-2 ${
+                            className={`aspect-square rounded-2xl p-6 flex flex-col justify-between transition-all border shadow-sm group hover:border-slate-900 ${
                                 rumah.penghunian_aktif 
-                                ? 'bg-blue-50 border-blue-200 hover:border-blue-400' 
-                                : 'bg-gray-50 border-gray-200 hover:border-gray-400'
+                                ? 'bg-white border-gray-100' 
+                                : 'bg-gray-50/50 border-gray-100'
                             }`}
                         >
                             <div className="flex justify-between items-start">
-                                <span className={`text-2xl font-black ${rumah.penghunian_aktif ? 'text-blue-700' : 'text-gray-400'}`}>
+                                <span className={`text-2xl font-bold tracking-tight ${rumah.penghunian_aktif ? 'text-slate-900' : 'text-slate-300'}`}>
                                     {rumah.label}
                                 </span>
-                                <div className={`w-3 h-3 rounded-full ${rumah.penghunian_aktif ? 'bg-blue-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                                <div className={`w-2 h-2 rounded-full ${rumah.penghunian_aktif ? 'bg-emerald-400' : 'bg-gray-200'}`}></div>
                             </div>
                             
                             <div className="mt-4">
                                 {rumah.penghunian_aktif ? (
-                                    <div className="text-xs">
-                                        <p className="text-blue-400 font-bold uppercase tracking-wider">Terisi</p>
-                                        <p className="text-blue-900 font-semibold truncate">{rumah.penghunian_aktif.penghuni?.nama_lengkap}</p>
+                                    <div className="text-[10px] font-bold uppercase tracking-widest">
+                                        <p className="text-emerald-600 mb-1">Occupied</p>
+                                        <p className="text-slate-900 truncate normal-case tracking-normal text-xs font-bold">{rumah.penghunian_aktif.penghuni?.nama_lengkap}</p>
                                     </div>
                                 ) : (
-                                    <div className="text-xs">
-                                        <p className="text-gray-400 font-bold uppercase tracking-wider">Kosong</p>
+                                    <div className="text-[10px] font-bold uppercase tracking-widest text-slate-300">
+                                        <p>Vacant</p>
                                     </div>
                                 )}
                             </div>
@@ -53,14 +53,14 @@ const RumahList = () => {
                     ))}
                 </div>
 
-                <div className="mt-12 flex items-center space-x-6 text-sm text-gray-500 bg-white p-4 rounded-xl border inline-flex">
-                    <div className="flex items-center space-x-2">
-                        <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                        <span>Berpenghuni</span>
+                <div className="mt-12 flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 border border-gray-100 px-6 py-4 rounded-2xl inline-flex bg-white">
+                    <div className="flex items-center gap-3">
+                        <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full"></div>
+                        <span>Occupied</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                        <div className="w-4 h-4 bg-gray-300 rounded"></div>
-                        <span>Kosong / Tersedia</span>
+                    <div className="flex items-center gap-3">
+                        <div className="w-2.5 h-2.5 bg-gray-200 rounded-full"></div>
+                        <span>Vacant / Available</span>
                     </div>
                 </div>
             </div>

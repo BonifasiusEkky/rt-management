@@ -42,6 +42,11 @@ Route::prefix('v1')->group(function () {
         Route::post('rumah/{rumah}/assign', [RumahController::class, 'assign']);
         Route::post('rumah/{rumah}/kosongkan', [RumahController::class, 'kosongkan']);
 
+
+        // Tagihan endpoints
+        Route::get('tagihan', [\App\Http\Controllers\Api\V1\TagihanController::class, 'index']);
+        Route::post('tagihan', [\App\Http\Controllers\Api\V1\TagihanController::class, 'store']);
+
         Route::post('tagihan/generate', function (\App\Services\TagihanService $service) {
             $count = $service->generateForMonth();
             return response()->json(['message' => "Berhasil membuat {$count} tagihan baru."]);
