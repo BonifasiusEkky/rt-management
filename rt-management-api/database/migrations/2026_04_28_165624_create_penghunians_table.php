@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('penghunians', function (Blueprint $table) {
             $table->id();
             $table->foreignId('rumah_id')->constrained('rumahs');
-            $table->foreignId('penghuni_id')->constrained('penghuni');
+            $table->foreignId('penghuni_id')->constrained('penghunis');
             $table->date('tanggal_masuk');
             $table->date('tanggal_keluar')->nullable();
             $table->boolean('aktif')->default(true);

@@ -9,7 +9,7 @@ class Penghuni extends Model
 {
     use HasFactory;
 
-    protected $table = 'penghuni';
+    protected $table = 'penghunis';
     protected $guarded = [];
 
     public function penghunians()
