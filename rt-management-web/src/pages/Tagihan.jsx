@@ -112,8 +112,10 @@ function TagihanCustomModal({ open, onClose, defaultPeriode }) {
   const queryClient = useQueryClient();
 
   const [form, setForm] = useState(() => ({
+    mode: 'semua',
     penghunian_id: "",
     periode_bulan: defaultPeriode,
+    total_nominal: "",
     nominal: "",
     jatuh_tempo: getTodayISO(),
     keterangan: "",
@@ -130,17 +132,27 @@ function TagihanCustomModal({ open, onClose, defaultPeriode }) {
     return list.filter((r) => r.penghunian_aktif);
   }, [rumahRes]);
 
+  const occupiedCount = rumahOptions.length;
+
+  const nominalPerRumah = useMemo(() => {
+    const total = Number(form.total_nominal) || 0;
+    if (occupiedCount === 0 || total === 0) return 0;
+    return Math.floor(total / occupiedCount);
+  }, [form.total_nominal, occupiedCount]);
+
   const mutation = useMutation({
     mutationFn: async (payload) => {
       return client.post("/tagihan", payload).then((r) => r.data);
     },
-    onSuccess: async () => {
-      toast.success("Tagihan custom berhasil dibuat");
+    onSuccess: async (res) => {
+      toast.success(res.message || "Tagihan custom berhasil dibuat");
       await queryClient.invalidateQueries({ queryKey: ["tagihan"] });
       onClose();
       setForm({
+        mode: 'semua',
         penghunian_id: "",
         periode_bulan: defaultPeriode,
+        total_nominal: "",
         nominal: "",
         jatuh_tempo: getTodayISO(),
         keterangan: "",
@@ -154,14 +166,22 @@ function TagihanCustomModal({ open, onClose, defaultPeriode }) {
   if (!open) return null;
 
   const validate = () => {
-    const nominalNum = Number(form.nominal);
-    if (!form.penghunian_id) return "Pilih rumah/warga terlebih dahulu.";
     if (!form.periode_bulan) return "Periode wajib diisi.";
-    if (!Number.isFinite(nominalNum) || nominalNum < 1000) return "Nominal minimal 1000.";
     if (!form.jatuh_tempo) return "Jatuh tempo wajib diisi.";
     if (form.jatuh_tempo < getTodayISO()) return "Jatuh tempo tidak boleh sebelum hari ini.";
     if (!form.keterangan.trim()) return "Keterangan wajib diisi.";
     if (form.keterangan.length > 255) return "Keterangan maksimal 255 karakter.";
+
+    if (form.mode === 'semua') {
+      const totalNum = Number(form.total_nominal);
+      if (!Number.isFinite(totalNum) || totalNum < 1000) return "Total nominal minimal Rp 1.000.";
+      if (occupiedCount === 0) return "Tidak ada rumah yang terisi saat ini.";
+    } else {
+      if (!form.penghunian_id) return "Pilih rumah/warga terlebih dahulu.";
+      const nomNum = Number(form.nominal);
+      if (!Number.isFinite(nomNum) || nomNum < 1000) return "Nominal minimal Rp 1.000.";
+    }
+
     return null;
   };
 
@@ -173,41 +193,86 @@ function TagihanCustomModal({ open, onClose, defaultPeriode }) {
       return;
     }
 
-    mutation.mutate({
-      penghunian_id: Number(form.penghunian_id),
-      jenis: "custom",
-      nominal: Number(form.nominal),
+    const payload = {
+      mode: form.mode,
       periode_bulan: form.periode_bulan,
       jatuh_tempo: form.jatuh_tempo,
       keterangan: form.keterangan.trim(),
-    });
+    };
+
+    if (form.mode === 'semua') {
+      payload.total_nominal = Number(form.total_nominal);
+    } else {
+      payload.penghunian_id = Number(form.penghunian_id);
+      payload.nominal = Number(form.nominal);
+    }
+
+    mutation.mutate(payload);
   };
 
   return (
     <Modal open={open} onClose={onClose} title="Tagihan Custom">
       <form onSubmit={onSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1">Pilih Rumah (Warga)</label>
-          <select
-            className="w-full px-4 py-3 rounded-lg border border-border"
-            value={form.penghunian_id}
-            onChange={(e) => setForm((p) => ({ ...p, penghunian_id: e.target.value }))}
-            required
-          >
-            <option value="">-- Pilih Unit Rumah --</option>
-            {rumahLoading ? (
-              <option value="" disabled>
-                Memuat...
-              </option>
-            ) : (
-              rumahOptions.map((r) => (
-                <option key={r.id} value={r.penghunian_aktif.id}>
-                  {r.label} - {r.penghunian_aktif.penghuni?.nama_lengkap}
-                </option>
-              ))
-            )}
-          </select>
+        {/* Mode Selector */}
+        <div className="flex gap-4 mb-2">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input 
+              type="radio" 
+              name="mode" 
+              value="semua"
+              checked={form.mode === 'semua'}
+              onChange={(e) => setForm(p => ({ ...p, mode: e.target.value }))}
+              className="text-slate-900 focus:ring-slate-900"
+            />
+            <span className="text-sm font-semibold text-slate-700">Tagih ke Semua Rumah</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input 
+              type="radio" 
+              name="mode" 
+              value="pilih"
+              checked={form.mode === 'pilih'}
+              onChange={(e) => setForm(p => ({ ...p, mode: e.target.value }))}
+              className="text-slate-900 focus:ring-slate-900"
+            />
+            <span className="text-sm font-semibold text-slate-700">Pilih Rumah Tertentu</span>
+          </label>
         </div>
+
+        {form.mode === 'semua' ? (
+          <>
+            {/* Info banner */}
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+              <p className="text-xs font-bold text-blue-700 mb-1">Tagihan ke semua rumah terisi</p>
+              <p className="text-[11px] text-blue-500">
+                {rumahLoading ? 'Memuat data...' : `${occupiedCount} rumah terisi saat ini. Total nominal akan dibagi rata.`}
+              </p>
+            </div>
+          </>
+        ) : (
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Pilih Rumah (Warga)</label>
+            <select
+              className="w-full px-4 py-3 rounded-lg border border-border"
+              value={form.penghunian_id}
+              onChange={(e) => setForm((p) => ({ ...p, penghunian_id: e.target.value }))}
+              required={form.mode === 'pilih'}
+            >
+              <option value="">-- Pilih Unit Rumah --</option>
+              {rumahLoading ? (
+                <option value="" disabled>
+                  Memuat...
+                </option>
+              ) : (
+                rumahOptions.map((r) => (
+                  <option key={r.id} value={r.penghunian_aktif.id}>
+                    {r.label} - {r.penghunian_aktif.penghuni?.nama_lengkap}
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -221,19 +286,44 @@ function TagihanCustomModal({ open, onClose, defaultPeriode }) {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Nominal</label>
-            <input
-              type="number"
-              min={1000}
-              className="w-full px-4 py-3 rounded-lg border border-border"
-              placeholder="10000"
-              value={form.nominal}
-              onChange={(e) => setForm((p) => ({ ...p, nominal: e.target.value }))}
-              required
-            />
-          </div>
+          {form.mode === 'semua' ? (
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Total Nominal</label>
+              <input
+                type="number"
+                min={1000}
+                className="w-full px-4 py-3 rounded-lg border border-border"
+                placeholder="1000000"
+                value={form.total_nominal}
+                onChange={(e) => setForm((p) => ({ ...p, total_nominal: e.target.value }))}
+                required={form.mode === 'semua'}
+              />
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Nominal</label>
+              <input
+                type="number"
+                min={1000}
+                className="w-full px-4 py-3 rounded-lg border border-border"
+                placeholder="10000"
+                value={form.nominal}
+                onChange={(e) => setForm((p) => ({ ...p, nominal: e.target.value }))}
+                required={form.mode === 'pilih'}
+              />
+            </div>
+          )}
         </div>
+
+        {/* Per-house calculation preview */}
+        {form.mode === 'semua' && Number(form.total_nominal) > 0 && occupiedCount > 0 && (
+          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-slate-500 font-medium">Rp {formatRupiah(form.total_nominal)} ÷ {occupiedCount} rumah</span>
+              <span className="font-bold text-slate-900">= Rp {formatRupiah(nominalPerRumah)} / rumah</span>
+            </div>
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1">Jatuh Tempo</label>
@@ -252,7 +342,7 @@ function TagihanCustomModal({ open, onClose, defaultPeriode }) {
             type="text"
             maxLength={255}
             className="w-full px-4 py-3 rounded-lg border border-border"
-            placeholder="Contoh: Iuran keamanan tambahan"
+            placeholder="Contoh: Iuran perbaikan jalan"
             value={form.keterangan}
             onChange={(e) => setForm((p) => ({ ...p, keterangan: e.target.value }))}
             required
@@ -289,7 +379,7 @@ function TagihanCardSkeleton() {
   );
 }
 
-function TagihanCard({ tagihan }) {
+function TagihanCard({ tagihan, onVerify, isVerifying }) {
   const status = tagihan.status || "menunggu";
 
   const statusColors = {
@@ -301,14 +391,21 @@ function TagihanCard({ tagihan }) {
   const colors = statusColors[status] || statusColors.menunggu;
 
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl p-6 hover:shadow-sm transition-all group">
+    <div className="bg-white border border-gray-200 shadow-sm rounded-2xl p-6 hover:shadow-md transition-all group">
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-6 flex-1">
           <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center font-bold text-slate-900 text-sm border border-gray-100">
             {tagihan.rumah}
           </div>
           <div className="flex-1">
-            <div className="font-bold text-slate-900 text-base tracking-tight">{tagihan.nama}</div>
+            <div className="font-bold text-slate-900 text-base tracking-tight">
+              {tagihan.nama}
+              {tagihan.is_custom && (
+                <span className="ml-2 px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 text-[9px] font-bold uppercase tracking-wider align-middle">
+                  Custom
+                </span>
+              )}
+            </div>
             {tagihan.detail && <div className="text-slate-400 text-xs mt-1 font-medium">{tagihan.detail}</div>}
             <div className="text-slate-900 font-bold text-sm mt-3">Rp {formatRupiah(tagihan.nominal)}</div>
           </div>
@@ -318,8 +415,12 @@ function TagihanCard({ tagihan }) {
             {status === 'menunggu' ? 'Pending' : status === 'lunas' ? 'Paid' : 'Overdue'}
           </span>
           {status !== 'lunas' && (
-            <button className="px-5 py-2 rounded-xl bg-slate-900 text-white text-[11px] font-bold hover:bg-slate-800 transition-all active:scale-[0.98]">
-              Verify
+            <button 
+              onClick={() => onVerify(tagihan)}
+              disabled={isVerifying}
+              className="px-5 py-2 rounded-xl bg-slate-900 text-white text-[11px] font-bold hover:bg-slate-800 transition-all active:scale-[0.98] disabled:opacity-50"
+            >
+              {isVerifying ? '...' : 'Verify'}
             </button>
           )}
         </div>
@@ -350,12 +451,31 @@ export default function Tagihan() {
         .then((r) => r.data),
   });
 
+  const queryClient = useQueryClient();
+  const verifyMutation = useMutation({
+    mutationFn: (item) => client.post("/tagihan/verify", {
+      penghunian_id: item.penghunian_id,
+      periode_bulan: selectedMonth,
+      is_custom: item.is_custom
+    }).then(r => ({ ...r.data, id: item.id })),
+    onSuccess: (res) => {
+      toast.success(res.message);
+      queryClient.invalidateQueries({ queryKey: ["tagihan"] });
+      queryClient.invalidateQueries({ queryKey: ["report"] });
+    },
+    onError: (err) => {
+      toast.error(firstApiErrorMessage(err));
+    }
+  });
+
   const tagihanList = response?.data ?? [];
   const meta = response?.meta;
 
   const cards = useMemo(() => {
     let list = tagihanList.map((item) => ({
-      id: item.penghunian_id,
+      id: `${item.penghunian_id}_${item.is_custom ? 'custom' : 'tetap'}`,
+      penghunian_id: item.penghunian_id,
+      is_custom: item.is_custom,
       rumah: getRumahLabel(item.rumah),
       nama: item.penghuni?.nama_lengkap ?? "-",
       detail: item.keterangan ?? "",
@@ -378,7 +498,7 @@ export default function Tagihan() {
 
   return (
     <Layout>
-      <div className="p-10 bg-white min-h-screen">
+      <div className="p-10 min-h-screen">
         {/* Header */}
         <div className="mb-10">
           <div className="flex justify-between items-start mb-8">
@@ -486,7 +606,14 @@ export default function Tagihan() {
               </p>
             </div>
           ) : (
-            cards.map((t) => <TagihanCard key={t.id} tagihan={t} />)
+            cards.map((t) => (
+              <TagihanCard 
+                key={t.id} 
+                tagihan={t} 
+                onVerify={verifyMutation.mutate}
+                isVerifying={verifyMutation.isPending && verifyMutation.variables?.id === t.id}
+              />
+            ))
           )}
         </div>
 

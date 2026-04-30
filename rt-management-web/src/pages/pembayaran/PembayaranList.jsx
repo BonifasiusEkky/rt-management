@@ -25,7 +25,7 @@ const PembayaranList = () => {
 
     return (
         <Layout>
-            <div className="p-10 bg-white min-h-screen">
+            <div className="p-10 min-h-screen">
                 <div className="flex justify-between items-center mb-10">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Payments</h1>
@@ -48,7 +48,7 @@ const PembayaranList = () => {
                     </div>
                 </div>
 
-                <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+                <div className="bg-white border border-gray-200 rounded-2xl shadow-md overflow-hidden">
                     <table className="w-full text-left text-sm">
                         <thead className="bg-white border-b border-gray-100">
                             <tr>

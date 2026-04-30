@@ -36,17 +36,17 @@ class DashboardController extends Controller
         $totalPengeluaran = Pengeluaran::sum('nominal');
         $saldoSaatIni = $saldoAwal + $totalPemasukan - $totalPengeluaran;
 
-        // Chart Data (Last 6 Months)
+        // Chart Data (Full Calendar Year)
         $chartData = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $month = $now->copy()->subMonths($i);
+        for ($m = 1; $m <= 12; $m++) {
+            $month = Carbon::create($now->year, $m, 1);
             
-            $in = Pembayaran::whereMonth('tanggal_bayar', $month->month)
-                ->whereYear('tanggal_bayar', $month->year)
+            $in = Pembayaran::whereMonth('tanggal_bayar', $m)
+                ->whereYear('tanggal_bayar', $now->year)
                 ->sum('jumlah_bayar');
                 
-            $out = Pengeluaran::whereMonth('tanggal', $month->month)
-                ->whereYear('tanggal', $month->year)
+            $out = Pengeluaran::whereMonth('tanggal', $m)
+                ->whereYear('tanggal', $now->year)
                 ->sum('nominal');
                 
             $chartData[] = [
@@ -55,6 +55,51 @@ class DashboardController extends Controller
                 'pengeluaran' => (int) $out,
             ];
         }
+
+        // Recent Activity (Combined Payments & Expenses)
+        $recentPembayaran = Pembayaran::with('tagihans.penghunian.penghuni')
+            ->orderBy('tanggal_bayar', 'desc')
+            ->orderBy('id', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function($p) {
+                $jenis = $p->tagihans->map(fn($t) => $t->jenis)->unique()->implode(', ');
+                return [
+                    'id' => 'p-' . $p->id,
+                    'tipe' => 'pemasukan',
+                    'tanggal' => $p->tanggal_bayar,
+                    'keterangan' => 'Pembayaran iuran ' . ($jenis ?: 'Umum'),
+                    'nama' => $p->tagihans->first()?->penghunian->penghuni->nama_lengkap ?? 'Warga',
+                    'nominal' => (int) $p->jumlah_bayar,
+                    'raw_id' => $p->id
+                ];
+            });
+
+        $recentPengeluaran = Pengeluaran::orderBy('tanggal', 'desc')
+            ->orderBy('id', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function($p) {
+                return [
+                    'id' => 'e-' . $p->id,
+                    'tipe' => 'pengeluaran',
+                    'tanggal' => $p->tanggal,
+                    'keterangan' => $p->keterangan,
+                    'nama' => 'Operational',
+                    'nominal' => (int) $p->nominal,
+                    'raw_id' => $p->id
+                ];
+            });
+
+        $recentActivity = $recentPembayaran->concat($recentPengeluaran)
+            ->sort(function($a, $b) {
+                if ($a['tanggal'] === $b['tanggal']) {
+                    return $b['raw_id'] <=> $a['raw_id'];
+                }
+                return $b['tanggal'] <=> $a['tanggal'];
+            })
+            ->take(8)
+            ->values();
 
         return response()->json([
             'stats' => [
@@ -65,7 +110,7 @@ class DashboardController extends Controller
                 'saldo_saat_ini' => (int) $saldoSaatIni,
             ],
             'chart' => $chartData,
-            'recent_pembayaran' => Pembayaran::with('tagihans.penghunian.penghuni')->latest()->take(5)->get()
+            'recent_activity' => $recentActivity
         ]);
     }
 }

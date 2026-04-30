@@ -110,106 +110,82 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        // 5. Create Tagihans (April & May 2026, satpam + kebersihan untuk yang aktif)
+        // 5. Create Tagihans for history (Jan-Mar 2026)
         $tagihanList = [];
-        $periodeApril = Carbon::create(2026, 4, 1)->toDateString();
-        $periodeMay = Carbon::create(2026, 5, 1)->toDateString();
-        
-        foreach ($penghunians as $idx => $penghunian) {
-            if ($penghunian->aktif) {
-                // April - Most paid, some late
-                $statusApril = $idx < 14 ? 'lunas' : 'menunggu';
-                
-                $tagihanList[] = \App\Models\Tagihan::create([
-                    'penghunian_id' => $penghunian->id,
-                    'jenis' => 'satpam',
-                    'nominal' => 100000,
-                    'periode_bulan' => $periodeApril,
-                    'status' => $statusApril,
-                    'jatuh_tempo' => Carbon::create(2026, 4, 10)->toDateString(),
-                    'keterangan' => null,
-                ]);
-
-                $tagihanList[] = \App\Models\Tagihan::create([
-                    'penghunian_id' => $penghunian->id,
-                    'jenis' => 'kebersihan',
-                    'nominal' => 15000,
-                    'periode_bulan' => $periodeApril,
-                    'status' => $statusApril,
-                    'jatuh_tempo' => Carbon::create(2026, 4, 10)->toDateString(),
-                    'keterangan' => null,
-                ]);
-
-                // May - All unpaid (menunggu)
-                $tagihanList[] = \App\Models\Tagihan::create([
-                    'penghunian_id' => $penghunian->id,
-                    'jenis' => 'satpam',
-                    'nominal' => 100000,
-                    'periode_bulan' => $periodeMay,
-                    'status' => 'menunggu',
-                    'jatuh_tempo' => Carbon::create(2026, 5, 10)->toDateString(),
-                    'keterangan' => null,
-                ]);
-
-                $tagihanList[] = \App\Models\Tagihan::create([
-                    'penghunian_id' => $penghunian->id,
-                    'jenis' => 'kebersihan',
-                    'nominal' => 15000,
-                    'periode_bulan' => $periodeMay,
-                    'status' => 'menunggu',
-                    'jatuh_tempo' => Carbon::create(2026, 5, 10)->toDateString(),
-                    'keterangan' => null,
-                ]);
-            }
-        }
-
-        // 6. Create Pembayarans (linked to April lunas tagihans)
-        $paidTagihans = array_filter($tagihanList, fn($t) => $t->status === 'lunas');
-        $groupedByPenghunian = collect($paidTagihans)->groupBy('penghunian_id');
-        
-        foreach ($groupedByPenghunian as $penghunianId => $tagihanPerPenghunian) {
-            $periodeGroups = collect($tagihanPerPenghunian)->groupBy('periode_bulan');
-            foreach ($periodeGroups as $periode => $tagihanPerPeriode) {
-                if (count($tagihanPerPeriode) > 0) {
-                    $totalNominal = $tagihanPerPeriode->sum('nominal');
-                    $pembayaran = \App\Models\Pembayaran::create([
-                        'jumlah_bayar' => $totalNominal,
-                        'tanggal_bayar' => Carbon::parse($periode)->addDays(5)->toDateString(),
-                        'periode_dibayar' => 1,
-                        'metode' => 'transfer',
-                        'catatan' => 'Pembayaran April',
-                        'dikonfirmasi_oleh' => 'admin@rt.local',
+        for ($m = 1; $m <= 3; $m++) {
+            $periode = Carbon::create(2026, $m, 1)->toDateString();
+            foreach ($penghunians as $idx => $penghunian) {
+                if ($penghunian->aktif) {
+                    $tagihanList[] = \App\Models\Tagihan::create([
+                        'penghunian_id' => $penghunian->id,
+                        'jenis' => 'satpam',
+                        'nominal' => 100000,
+                        'periode_bulan' => $periode,
+                        'status' => 'lunas',
+                        'jatuh_tempo' => Carbon::create(2026, $m, 10)->toDateString(),
                     ]);
-                    foreach ($tagihanPerPeriode as $tagihan) {
-                        $pembayaran->tagihans()->attach($tagihan->id);
-                    }
+                    $tagihanList[] = \App\Models\Tagihan::create([
+                        'penghunian_id' => $penghunian->id,
+                        'jenis' => 'kebersihan',
+                        'nominal' => 15000,
+                        'periode_bulan' => $periode,
+                        'status' => 'lunas',
+                        'jatuh_tempo' => Carbon::create(2026, $m, 10)->toDateString(),
+                    ]);
                 }
             }
         }
 
-        // 7. Create Pengeluarans (various expenses)
-        $pengeluaranKategori = [
-            ['kategori' => 'Gaji Satpam', 'nominal' => 1000000, 'berulang' => true, 'deskripsi' => 'Gaji bulanan satpam'],
-            ['kategori' => 'Listrik Pos Satpam', 'nominal' => 150000, 'berulang' => true, 'deskripsi' => 'Biaya token listrik pos satpam'],
-            ['kategori' => 'Pemeliharaan Taman', 'nominal' => 300000, 'berulang' => true, 'deskripsi' => 'Pemeliharaan & penyiraman taman'],
+        // 6. Create Pembayarans for historical tagihans
+        foreach ($tagihanList as $tagihan) {
+            $pembayaran = \App\Models\Pembayaran::create([
+                'jumlah_bayar' => $tagihan->nominal,
+                'tanggal_bayar' => Carbon::parse($tagihan->periode_bulan)->addDays(rand(1, 10))->toDateString(),
+                'periode_dibayar' => 1,
+                'metode' => rand(0, 1) ? 'transfer' : 'tunai',
+                'catatan' => 'Pembayaran rutin ' . $tagihan->jenis,
+                'dikonfirmasi_oleh' => 'admin@rt.local',
+            ]);
+            $pembayaran->tagihans()->attach($tagihan->id);
+        }
+
+        // 7. Create Pengeluarans for history (Jan-Mar 2026)
+        $templates = [
+            ['nama' => 'Gaji Satpam', 'nominal' => 1000000],
+            ['nama' => 'Listrik Pos Satpam', 'nominal' => 150000],
         ];
 
-        foreach ($pengeluaranKategori as $item) {
-            for ($month = 2; $month <= 4; $month++) {
+        for ($m = 1; $m <= 3; $m++) {
+            $periode = Carbon::create(2026, $m, 1)->toDateString();
+            foreach ($templates as $item) {
                 \App\Models\Pengeluaran::create([
-                    'kategori' => $item['kategori'],
+                    'kategori' => $item['nama'],
                     'nominal' => $item['nominal'],
-                    'tanggal' => Carbon::create(2026, $month, 5)->toDateString(),
-                    'berulang' => $item['berulang'],
-                    'deskripsi' => $item['deskripsi'],
+                    'tanggal' => Carbon::create(2026, $m, 5)->toDateString(),
+                    'berulang' => true,
+                    'status' => 'selesai',
+                    'periode_bulan' => $periode,
+                    'deskripsi' => 'Pengeluaran rutin bulanan',
                 ]);
             }
         }
 
-        // 8. Pengaturan (Opening Balance & Nama RT)
+        // 8. Pengeluaran Tetap (Recurring Templates for dynamic generation)
+        \App\Models\PengeluaranTetap::create([
+            'nama' => 'Gaji Satpam',
+            'nominal' => 1000000,
+            'aktif' => true,
+        ]);
+        \App\Models\PengeluaranTetap::create([
+            'nama' => 'Listrik Pos Satpam',
+            'nominal' => 150000,
+            'aktif' => true,
+        ]);
+
+        // 9. Pengaturan (Opening Balance & Nama RT)
         \App\Models\Pengaturan::create([
             'key' => 'saldo_awal',
-            'value' => '15000000', // Positive cash flow
+            'value' => '1000000', // Set to 1 million
         ]);
         \App\Models\Pengaturan::create([
             'key' => 'nama_perumahan',

@@ -49,6 +49,8 @@ class PenghuniController extends Controller
             $validated['foto_ktp_path'] = $path;
         }
 
+        unset($validated['foto_ktp']);
+
         $penghuni = Penghuni::create($validated);
 
         return new PenghuniResource($penghuni);
@@ -80,6 +82,8 @@ class PenghuniController extends Controller
             $validated['foto_ktp_path'] = $path;
         }
 
+        unset($validated['foto_ktp']);
+
         $penghuni->update($validated);
 
         return new PenghuniResource($penghuni);
@@ -87,11 +91,26 @@ class PenghuniController extends Controller
 
     public function destroy(Penghuni $penghuni)
     {
-        // Soft delete (archive)
+        // Archive the resident
         $penghuni->update(['is_archived' => true]);
 
+        // End active residencies
+        $penghuni->penghunians()->whereNull('tanggal_keluar')->update([
+            'tanggal_keluar' => now()->toDateString(),
+            'aktif' => false
+        ]);
+
         return response()->json([
-            'message' => 'Penghuni berhasil diarsipkan'
+            'message' => 'Penghuni berhasil diarsipkan dan unit rumah telah dikosongkan'
+        ]);
+    }
+
+    public function unarchive(Penghuni $penghuni)
+    {
+        $penghuni->update(['is_archived' => false]);
+
+        return response()->json([
+            'message' => 'Penghuni berhasil dipulihkan dari arsip'
         ]);
     }
 

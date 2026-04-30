@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
+import { toast } from 'sonner';
 import client from '../../api/client';
 import Layout from '../../components/Layout';
 
@@ -28,10 +29,11 @@ const PenghuniForm = () => {
             await client.post('/penghuni', data, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
+            toast.success('Penghuni berhasil ditambahkan');
             navigate('/penghuni');
         } catch (err) {
             console.error(err);
-            alert('Gagal menyimpan data');
+            toast.error('Gagal menyimpan data');
         } finally {
             setLoading(false);
         }
@@ -39,7 +41,7 @@ const PenghuniForm = () => {
 
     return (
         <Layout>
-            <div className="p-10 max-w-2xl mx-auto min-h-screen bg-white">
+            <div className="p-10 max-w-2xl mx-auto min-h-screen">
                 <div className="mb-10">
                     <Link to="/penghuni" className="group inline-flex items-center gap-2 text-slate-400 hover:text-slate-900 transition-colors mb-4">
                         <div className="p-2 rounded-xl bg-gray-50 group-hover:bg-gray-100 transition-colors">

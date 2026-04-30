@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
+import { toast } from 'sonner';
 import client from '../../api/client';
 import Layout from '../../components/Layout';
 
@@ -26,15 +27,15 @@ const PembayaranForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.penghunian_id) return alert('Pilih rumah terlebih dahulu');
+        if (!formData.penghunian_id) return toast.error('Pilih rumah terlebih dahulu');
         
         setLoading(true);
         try {
             await client.post('/pembayaran', formData);
-            alert('Pembayaran berhasil dicatat!');
+            toast.success('Pembayaran berhasil dicatat!');
             navigate('/pembayaran');
         } catch (err) {
-            alert(err.response?.data?.message || 'Gagal mencatat pembayaran');
+            toast.error(err.response?.data?.message || 'Gagal mencatat pembayaran');
         } finally {
             setLoading(false);
         }

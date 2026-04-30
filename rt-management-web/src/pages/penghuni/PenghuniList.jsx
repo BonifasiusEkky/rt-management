@@ -7,10 +7,17 @@ import Layout from '../../components/Layout';
 const PenghuniList = () => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
+    const [tab, setTab] = useState('active'); // active or archived
     
     const { data: response, isLoading } = useQuery({
-        queryKey: ['penghuni', page, search],
-        queryFn: () => client.get(`/penghuni?page=${page}&search=${search}`).then(res => res.data)
+        queryKey: ['penghuni', page, search, tab],
+        queryFn: () => client.get(`/penghuni`, { 
+            params: { 
+                page, 
+                search, 
+                is_archived: tab === 'archived' ? 1 : 0 
+            } 
+        }).then(res => res.data)
     });
 
     const penghunis = response?.data || [];
@@ -22,9 +29,14 @@ const PenghuniList = () => {
         setPage(1);
     };
 
+    const handleTabChange = (newTab) => {
+        setTab(newTab);
+        setPage(1);
+    };
+
     return (
         <Layout>
-            <div className="p-10 bg-white min-h-screen">
+            <div className="p-10 min-h-screen">
                 {/* Header */}
                 <div className="flex justify-between items-start mb-10">
                     <div>
@@ -48,8 +60,26 @@ const PenghuniList = () => {
                     </div>
                 </div>
 
+                {/* Tabs */}
+                <div className="flex gap-8 border-b border-gray-100 mb-8">
+                    <button 
+                        onClick={() => handleTabChange('active')}
+                        className={`pb-4 text-xs font-bold uppercase tracking-widest transition-all relative ${tab === 'active' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}
+                    >
+                        Active Residents
+                        {tab === 'active' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-slate-900 rounded-full" />}
+                    </button>
+                    <button 
+                        onClick={() => handleTabChange('archived')}
+                        className={`pb-4 text-xs font-bold uppercase tracking-widest transition-all relative ${tab === 'archived' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}
+                    >
+                        Archived / History
+                        {tab === 'archived' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-slate-900 rounded-full" />}
+                    </button>
+                </div>
+
                 {/* Table */}
-                <div className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md">
                     <table className="w-full text-left text-sm">
                         <thead className="bg-white border-b border-gray-100">
                             <tr>

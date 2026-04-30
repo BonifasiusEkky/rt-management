@@ -14,7 +14,7 @@ const Layout = ({ children }) => {
     return (
         <div className="min-h-screen bg-white flex">
             {/* Sidebar */}
-            <aside className="w-64 bg-white border-r border-gray-100 flex flex-col">
+            <aside className="w-64 bg-white border-r border-gray-100 flex flex-col shadow-xl shadow-gray-100 z-10 print:hidden">
                 <div className="p-8 font-bold text-xl tracking-tight text-slate-900">
                     RT Admin
                 </div>
@@ -25,6 +25,7 @@ const Layout = ({ children }) => {
                     <Link to="/tagihan" className="block px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">Tagihan</Link>
                     <Link to="/pembayaran" className="block px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">Pembayaran</Link>
                     <Link to="/pengeluaran" className="block px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">Pengeluaran</Link>
+                    <Link to="/laporan" className="block px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">Laporan</Link>
                 </nav>
                 <div className="p-6 border-t border-gray-50">
                     <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Account</div>
@@ -34,7 +35,7 @@ const Layout = ({ children }) => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-auto bg-white">
+            <main className="flex-1 overflow-auto bg-slate-50">
                 {children}
             </main>
         </div>

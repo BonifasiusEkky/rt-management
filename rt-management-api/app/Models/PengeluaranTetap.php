@@ -5,14 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Pengeluaran extends Model
+class PengeluaranTetap extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
 
     protected $casts = [
-        'berulang' => 'boolean',
-        'periode_bulan' => 'date',
+        'aktif' => 'boolean',
     ];
 }

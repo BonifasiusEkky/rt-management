@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class TagihanStoreRequest extends FormRequest
 {
@@ -15,12 +14,10 @@ class TagihanStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'penghunian_id' => [
-                'required',
-                Rule::exists('penghunians', 'id')->where(fn ($q) => $q->where('aktif', true)),
-            ],
-            'jenis' => 'required|in:custom',
-            'nominal' => 'required|integer|min:1000',
+            'mode' => 'required|in:semua,pilih',
+            'penghunian_id' => 'required_if:mode,pilih|nullable|exists:penghunians,id',
+            'total_nominal' => 'required_if:mode,semua|nullable|integer|min:1000',
+            'nominal' => 'required_if:mode,pilih|nullable|integer|min:1000',
             'periode_bulan' => 'required|date_format:Y-m',
             'jatuh_tempo' => 'required|date|after_or_equal:today',
             'keterangan' => 'required|string|max:255',

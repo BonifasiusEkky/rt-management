@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import client from '../../api/client';
 import Layout from '../../components/Layout';
 
@@ -15,7 +16,7 @@ const PengaturanPage = () => {
         mutationFn: ({ id, nominal, aktif }) => client.put(`/tagihan-tetap/${id}`, { nominal, aktif }),
         onSuccess: () => {
             queryClient.invalidateQueries(['pengaturan']);
-            alert('Tarif berhasil diperbarui');
+            toast.success('Tarif berhasil diperbarui');
         }
     });
 
@@ -30,7 +31,7 @@ const PengaturanPage = () => {
 
                 <div className="space-y-8">
                     {/* Tarif Section */}
-                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-200">
                         <h2 className="text-xl font-bold mb-6 text-gray-800 flex items-center">
                             <span className="bg-blue-100 p-2 rounded-lg mr-3">💰</span>
                             Tarif Iuran Rutin
@@ -73,7 +74,7 @@ const PengaturanPage = () => {
                     </div>
 
                     {/* General Settings */}
-                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-200">
                         <h2 className="text-xl font-bold mb-6 text-gray-800 flex items-center">
                             <span className="bg-orange-100 p-2 rounded-lg mr-3">⚙️</span>
                             Konfigurasi Umum

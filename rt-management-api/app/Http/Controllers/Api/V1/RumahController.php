@@ -25,6 +25,39 @@ class RumahController extends Controller
         return new RumahResource($rumah);
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nomor_rumah' => 'required|string|max:255',
+            'blok' => 'required|string|max:255',
+        ]);
+
+        $rumah = Rumah::create($request->all());
+        return new RumahResource($rumah);
+    }
+
+    public function update(Request $request, Rumah $rumah)
+    {
+        $request->validate([
+            'nomor_rumah' => 'required|string|max:255',
+            'blok' => 'required|string|max:255',
+        ]);
+
+        $rumah->update($request->all());
+        return new RumahResource($rumah);
+    }
+
+    public function destroy(Rumah $rumah)
+    {
+        // Check if there's an active occupancy
+        if ($rumah->penghunianAktif()->exists()) {
+            return response()->json(['message' => 'Tidak dapat menghapus rumah yang sedang dihuni'], 422);
+        }
+
+        $rumah->delete();
+        return response()->json(['message' => 'Rumah berhasil dihapus']);
+    }
+
     public function assign(Request $request, Rumah $rumah)
     {
         $request->validate([
