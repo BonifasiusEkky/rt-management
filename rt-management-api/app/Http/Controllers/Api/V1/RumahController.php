@@ -21,7 +21,10 @@ class RumahController extends Controller
 
     public function show(Rumah $rumah)
     {
-        $rumah->load(['penghunianAktif', 'penghunians.penghuni']);
+        $rumah->load([
+            'penghunianAktif', 
+            'penghunians' => fn($q) => $q->with(['penghuni', 'tagihans' => fn($t) => $t->orderBy('periode_bulan', 'desc')])->latest()
+        ]);
         return new RumahResource($rumah);
     }
 
@@ -61,7 +64,7 @@ class RumahController extends Controller
     public function assign(Request $request, Rumah $rumah)
     {
         $request->validate([
-            'penghuni_id' => 'required|exists:penghuni,id',
+            'penghuni_id' => 'required|exists:penghunis,id',
             'tanggal_masuk' => 'required|date',
         ]);
 

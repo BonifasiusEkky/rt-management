@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Api\V1\TagihanResource;
 
 class PenghunianResource extends JsonResource
 {
@@ -18,6 +19,7 @@ class PenghunianResource extends JsonResource
             'aktif' => (bool) $this->aktif,
             'penghuni' => new PenghuniResource($this->whenLoaded('penghuni')),
             'rumah' => new RumahResource($this->whenLoaded('rumah')),
+            'tagihans' => TagihanResource::collection($this->whenLoaded('tagihans')),
         ];
     }
 }

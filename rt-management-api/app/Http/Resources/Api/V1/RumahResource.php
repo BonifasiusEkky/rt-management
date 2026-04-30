@@ -15,6 +15,7 @@ class RumahResource extends JsonResource
             'blok' => $this->blok,
             'label' => $this->blok . $this->nomor_rumah,
             'penghunian_aktif' => new PenghunianResource($this->whenLoaded('penghunianAktif')),
+            'penghunians' => PenghunianResource::collection($this->whenLoaded('penghunians')),
         ];
     }
 }

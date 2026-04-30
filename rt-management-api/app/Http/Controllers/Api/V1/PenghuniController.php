@@ -28,7 +28,18 @@ class PenghuniController extends Controller
             $query->where('nama_lengkap', 'like', '%' . $request->search . '%');
         }
 
-        $penghunis = $query->latest()->paginate($request->get('per_page', 10));
+        if ($request->has('unassigned_only')) {
+            $query->whereDoesntHave('penghunians', function ($q) {
+                $q->where('aktif', true);
+            });
+        }
+
+        // Return all for dropdowns if unassigned_only is present, otherwise paginate
+        if ($request->has('unassigned_only')) {
+            $penghunis = $query->latest()->get();
+        } else {
+            $penghunis = $query->latest()->paginate($request->get('per_page', 10));
+        }
 
         return PenghuniResource::collection($penghunis);
     }
