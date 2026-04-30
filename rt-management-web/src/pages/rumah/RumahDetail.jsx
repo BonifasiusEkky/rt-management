@@ -67,7 +67,30 @@ const RumahDetail = () => {
         }
     };
 
-    if (isLoading) return <Layout><div className="p-10 text-gray-400">Memuat data...</div></Layout>;
+    if (isLoading) return (
+        <Layout>
+            <div className="p-10 max-w-6xl mx-auto min-h-screen animate-pulse">
+                <div className="flex justify-between items-center mb-10">
+                    <div className="w-32 h-4 bg-gray-100 rounded" />
+                    <div className="flex gap-3">
+                        <div className="w-24 h-10 bg-gray-100 rounded-xl" />
+                        <div className="w-24 h-10 bg-gray-100 rounded-xl" />
+                    </div>
+                </div>
+                <div className="flex items-center gap-6 mb-12">
+                    <div className="w-20 h-20 bg-gray-100 rounded-3xl" />
+                    <div>
+                        <div className="w-64 h-10 bg-gray-100 rounded mb-4" />
+                        <div className="w-48 h-4 bg-gray-100 rounded" />
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <div className="bg-white p-8 rounded-3xl border border-gray-100 h-96 shadow-sm" />
+                    <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 h-96 shadow-sm" />
+                </div>
+            </div>
+        </Layout>
+    );
 
     const r = response?.data;
     const active = r.penghunian_aktif;

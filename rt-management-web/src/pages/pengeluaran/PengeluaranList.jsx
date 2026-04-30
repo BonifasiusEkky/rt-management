@@ -368,8 +368,16 @@ const PengeluaranList = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                            {isLoading ? (
-                                <tr><td colSpan="5" className="px-6 py-16 text-center text-slate-400 font-medium">Loading data...</td></tr>
+                             {isLoading ? (
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <tr key={i}>
+                                        <td className="px-6 py-3.5"><div className="animate-pulse bg-gray-100 h-4 w-24 rounded-lg" /></td>
+                                        <td className="px-6 py-3.5"><div className="animate-pulse bg-gray-100 h-4 w-32 rounded-lg" /></td>
+                                        <td className="px-6 py-3.5"><div className="animate-pulse bg-gray-100 h-4 w-48 rounded-lg" /></td>
+                                        <td className="px-6 py-3.5"><div className="animate-pulse bg-gray-100 h-4 w-20 rounded-lg" /></td>
+                                        <td className="px-6 py-3.5"><div className="animate-pulse bg-gray-100 h-4 w-16 rounded-lg float-right" /></td>
+                                    </tr>
+                                ))
                             ) : filteredData.length === 0 ? (
                                 <tr><td colSpan="5" className="px-6 py-16 text-center text-slate-400 font-medium">No expenses found for this period.</td></tr>
                             ) : filteredData.map((ex) => (

@@ -27,7 +27,18 @@ const RumahList = () => {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {isLoading ? (
-                        <p className="text-slate-400 font-medium">Loading map...</p>
+                        Array.from({ length: 15 }).map((_, i) => (
+                            <div key={i} className="aspect-square rounded-2xl p-6 border border-gray-100 shadow-sm bg-white animate-pulse">
+                                <div className="flex justify-between items-start">
+                                    <div className="w-12 h-8 bg-gray-100 rounded" />
+                                    <div className="w-2 h-2 rounded-full bg-gray-100" />
+                                </div>
+                                <div className="mt-auto">
+                                    <div className="w-12 h-3 bg-gray-100 rounded mb-2" />
+                                    <div className="w-24 h-4 bg-gray-100 rounded" />
+                                </div>
+                            </div>
+                        ))
                     ) : response?.data?.map((rumah) => {
                         const penghuni = rumah.penghunian_aktif?.penghuni;
                         const statusPenghuni = penghuni?.status;

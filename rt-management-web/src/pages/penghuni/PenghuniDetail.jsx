@@ -123,7 +123,30 @@ const PenghuniDetail = () => {
         }
     };
 
-    if (isLoading) return <Layout><div className="p-8">Loading...</div></Layout>;
+    if (isLoading) return (
+        <Layout>
+            <div className="p-10 max-w-5xl mx-auto min-h-screen animate-pulse">
+                <div className="flex justify-between items-start mb-10">
+                    <div>
+                        <div className="w-24 h-4 bg-gray-100 rounded mb-4" />
+                        <div className="w-64 h-10 bg-gray-100 rounded mb-4" />
+                        <div className="w-32 h-6 bg-gray-100 rounded-full" />
+                    </div>
+                    <div className="flex gap-3">
+                        <div className="w-32 h-10 bg-gray-100 rounded-xl" />
+                        <div className="w-32 h-10 bg-gray-100 rounded-xl" />
+                    </div>
+                </div>
+                <div className="grid grid-cols-3 gap-8">
+                    <div className="col-span-2 space-y-6">
+                        <div className="bg-white p-8 rounded-3xl border border-gray-100 h-64 shadow-sm" />
+                        <div className="bg-white p-8 rounded-3xl border border-gray-100 h-64 shadow-sm" />
+                    </div>
+                    <div className="bg-white p-8 rounded-3xl border border-gray-100 h-80 shadow-sm" />
+                </div>
+            </div>
+        </Layout>
+    );
     
     const p = response?.data;
     const isArchived = !!p.is_archived;

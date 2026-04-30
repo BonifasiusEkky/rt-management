@@ -10,6 +10,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend 
 } from 'recharts';
 import { Link } from 'react-router-dom';
+import DashboardSkeleton from '../components/ui/DashboardSkeleton';
 
 const Dashboard = () => {
   const [loadingTagihan, setLoadingTagihan] = useState(false);
@@ -37,7 +38,7 @@ const Dashboard = () => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
   };
 
-  if (isLoading) return <Layout><div className="p-8 text-gray-400">Memuat Dashboard...</div></Layout>;
+  if (isLoading) return <Layout><DashboardSkeleton /></Layout>;
 
   const { stats, chart, recent_activity } = response;
 

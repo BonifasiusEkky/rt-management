@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import client from '../../api/client';
 import Layout from '../../components/Layout';
+import TableSkeleton from '../../components/ui/TableSkeleton';
 
 const PenghuniList = () => {
     const [page, setPage] = useState(1);
@@ -92,9 +93,15 @@ const PenghuniList = () => {
                         </thead>
                         <tbody className="divide-y divide-gray-50">
                             {isLoading ? (
-                                <tr>
-                                    <td colSpan="5" className="px-8 py-16 text-center text-slate-400 font-medium">Loading data...</td>
-                                </tr>
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <tr key={i}>
+                                        <td className="px-8 py-5"><div className="animate-pulse bg-gray-100 h-4 w-48 rounded-lg" /></td>
+                                        <td className="px-8 py-5"><div className="animate-pulse bg-gray-100 h-4 w-24 rounded-lg" /></td>
+                                        <td className="px-8 py-5"><div className="animate-pulse bg-gray-100 h-4 w-32 rounded-lg" /></td>
+                                        <td className="px-8 py-5"><div className="animate-pulse bg-gray-100 h-4 w-20 rounded-lg" /></td>
+                                        <td className="px-8 py-5"><div className="animate-pulse bg-gray-100 h-4 w-16 rounded-lg float-right" /></td>
+                                    </tr>
+                                ))
                             ) : penghunis.length === 0 ? (
                                 <tr>
                                     <td colSpan="5" className="px-8 py-16 text-center text-slate-400 font-medium">No residents found.</td>
